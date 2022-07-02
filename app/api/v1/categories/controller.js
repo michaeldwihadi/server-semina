@@ -1,9 +1,18 @@
-const Categories = require("./model");
+const {
+  getAllCategories,
+  getOneCategories,
+  updateCategories,
+  createCategories,
+  deleteCategories,
+} = require("../../../services/mongoose/categories");
 
-const index = async (req, res, next) => {
+const { StatusCodes } = require("http-status-codes");
+
+const create = async (req, res) => {
   try {
-    const result = await Categories.find();
-    res.status(200).json({
+    const result = await createCategories(req);
+
+    res.status(StatusCodes.CREATED).json({
       data: result,
     });
   } catch (err) {
@@ -11,12 +20,11 @@ const index = async (req, res, next) => {
   }
 };
 
-const create = async (req, res, next) => {
+const index = async (req, res) => {
   try {
-    const { name } = req.body;
-    const result = await Categories.create({ name });
+    const result = await getAllCategories(req);
 
-    res.status(201).json({
+    res.status(StatusCodes.OK).json({
       data: result,
     });
   } catch (err) {
@@ -24,37 +32,11 @@ const create = async (req, res, next) => {
   }
 };
 
-const find = async (req, res, next) => {
+const find = async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await Categories.findOne({ _id: id });
+    const result = await getOneCategories(req);
 
-    if (!result) {
-      return res.status(404).json({ message: "Category ID not found !" });
-    }
-
-    res.status(200).json({
-      data: result,
-    });
-  } catch (error) {
-    next(err);
-  }
-};
-
-const update = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    const result = await Categories.findOneAndUpdate(
-      {
-        _id: id,
-      },
-      { name },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       data: result,
     });
   } catch (err) {
@@ -62,12 +44,23 @@ const update = async (req, res, next) => {
   }
 };
 
-const destroy = async (req, res, next) => {
+const update = async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await Categories.findByIdAndRemove(id);
+    const result = await updateCategories(req);
 
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const destroy = async (req, res) => {
+  try {
+    const result = await deleteCategories(req);
+
+    res.status(StatusCodes.OK).json({
       data: result,
     });
   } catch (err) {
@@ -77,8 +70,8 @@ const destroy = async (req, res, next) => {
 
 module.exports = {
   index,
-  create,
   find,
   update,
   destroy,
+  create,
 };
